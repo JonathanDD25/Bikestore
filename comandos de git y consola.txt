@@ -73,3 +73,11 @@ le das que no a las 2 cosas siguientes y listo
 
 para inicializar el projecto, entras al visual, abres la terminal e instalas las dependencias
 	npm i
+
+para añadir colaboradores y crear ramas en git
+primero te vas a settings, le das a colaborators, y colocas el correo del mienbro que quieras añadir
+
+clonas el repositorio donde se va a trabajar
+debes entrar a la carpeta del proyecto 
+	git switch -c feauture/nombre-rama
+	git branch es para ver todas las ramas de manera local
