@@ -1,0 +1,75 @@
+npm crate vite@latest
+
+REPOSITORIO GITHUB
+	git init
+
+Cambiar el nombre de maste a main:
+	git branch -M main
+
+Eliminar Credenciales de otros usuarios:
+	windows + S
+	administrador de credenciales
+Credenciales de windows
+	elimina las credenciales de windows que no sean suyas
+
+Configurar usuario local de Git:
+	git config user.email "mariopiedras0@gmail.com"
+	git config user.name "Mario-Piedras"
+
+Ahora agregar todos los archivos del proyecto:
+	git add .
+
+Realizar un commit descritivo de la versión a subir:
+	git commit -m "Primera Subida"
+
+Enlazar la dirección del repositorio en la nube con el local:
+	git remote add origin "URL del repositorio"
+	git push -u origin main
+
+Luego saldrá que debe iniciar sesión con el navegador:
+Inicie sesión con sus credenciales del GitHub.
+Actualiza el repositorio de la nube.
+
+Comprobar el estado del proyecto:
+	git status
+
+(Si aparece en algo en rojo significia que el archivo es nuevo o se ha modificado).
+
+comando para actualizar el repositorio con la versión local:
+	git status
+	git add .
+	git commit -m "nombre de la versión o descripción del commit"
+	git push
+
+Crear Ramas:
+Ambas son para crear la rama de manera local, debes elegir solo una
+	git checkout -b nombre_de_la_rama
+	git switch -c nombre_de_la_rama
+
+Crear la rama en el repositorio en la nube
+	git push origin nombre_de_la_rama
+
+Añadir colaboradores al repositorio:
+	si eres el dueño del repositorio, te saldrá la opción de settings, dale click
+	ahora vas a la parte izquierda y le das a colaborators y añadir persona.
+	ingresas el correo de la persona
+
+para ingresar a un repositorio de alguien, necesitas acceder y clonarlo
+
+para subir el primer commit a un repositorio externo es necesario asignar la dirección, esto sea hace asi:
+	git push origin -u origin nombre_de_la_rama
+
+ahora tienes que ir al git y darle a la parte que dice request, y aceptar, te saldra si no hay errores y lo subes al repositorio
+
+apartir de aqui se podra seguir haciendo los commit con solo el:
+	git push
+
+Crear proyecto react:
+	npm create vite@latest
+
+Escoger react
+escojer JavaScript + SWC
+le das que no a las 2 cosas siguientes y listo
+
+para inicializar el projecto, entras al visual, abres la terminal e instalas las dependencias
+	npm i
