@@ -1,4 +1,4 @@
-npm crate vite@latest
+git status -m "npm crate vite@latest
 
 REPOSITORIO GITHUB
 	git init
