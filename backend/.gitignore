@@ -1,3 +1,47 @@
 #Dependencias que no se deben subir al repositorio
 node_modules/
 package-lock.json
+
+#Archivos de entorno
+.env.local
+.env*.local
+
+#logs
+logs
+*.logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#Directorios de runtime
+dist/
+bulid/
+tmp/
+temp/
+
+#Archivos de sistema
+thumbs.db
+
+#Directorios y archivos de IDE/editores
+.idea/
+.vscode
+.*swp
+*.swo
+*swn
+.bak
+
+#Archivos de debug
+.debug
+debug.log
+
+#Archivos de cobertura
+coverage/
+
+#Archivos de uploads (exepto el directorio vacio)
+uploads/*
+!uploads/.gitkeep
+
+#otros
+*.pid
+*.seed
+*.pid.lock
