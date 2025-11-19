@@ -7,6 +7,7 @@ import detalle_entrada from "./routes/detalle_entrada.routes.js";
 import usuario from "./routes/usuario.routes.js";
 import pedidos from "./routes/pedidos.routes.js";
 import detalle_pedido from "./routes/detalle_pedido.routes.js";
+import auth from "./routes/auth.routes.js";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 //Rutas
+app.use("/auth", auth);
 app.use("/api/productos", productos);
 app.use("/api/entrada_insumo", entrada_insumo);
 app.use("/api/detalle_entrada", detalle_entrada);

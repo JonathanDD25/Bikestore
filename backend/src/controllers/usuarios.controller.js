@@ -81,6 +81,44 @@ export class UsuariosController {
             }
         }
     }
+
+    async inhabilitarUsuario(req, res) {
+        try {
+            const id = req.params.id;
+
+             // 1. Validar que el usuario existe
+            const usuario = await crud.obtenerUno("usuario", { id_usuario: id });
+
+            if (!usuario) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
+            }
+
+            // 2. Evitar que se inhabilite a sí mismo
+            if (req.usuario.id == id) {
+                return res.status(400).json({ error: "No puedes inhabilitar tu propia cuenta" });
+            }
+
+            // 3. Opcional: evitar que se inhabiliten administradores
+            if (usuario.rol === "Administrador") {
+                return res.status(403).json({ error: "No puedes inhabilitar a otro administrador" });
+            }
+
+            // 4. Actualizar el rol a Inhabilitado
+            const actualizado = await crud.actualizar(
+                "usuario", 
+                { id_usuario: id }, 
+                { rol: "Inhabilitado" }
+            );
+
+            return res.json({
+                mensaje: "Usuario inhabilitado correctamente",
+                usuario: actualizado
+            });
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    }
 };
 
 

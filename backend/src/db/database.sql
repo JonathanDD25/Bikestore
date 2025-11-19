@@ -9,7 +9,7 @@ CREATE TABLE usuario (
     apellidos VARCHAR(50),
     correo VARCHAR(100) UNIQUE,
     clave VARCHAR(255),
-    rol ENUM('Administrador', 'Operario', 'Cliente'),
+    rol ENUM('Administrador', 'Operario', 'Cliente', 'Inhabilitado'),
     direccion VARCHAR(150),
     telefono VARCHAR(20)
 );
@@ -37,7 +37,7 @@ CREATE TABLE pedido (
     fecha_pedido DATE DEFAULT (CURRENT_DATE),
     precio_total DECIMAL(18),
     descripcion TEXT,
-    metodo_pago ENUM('Efectivo', 'Tarjeta'),
+    metodo_pago VARCHAR(50),
     id_usuario INT,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
