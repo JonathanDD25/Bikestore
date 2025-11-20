@@ -25,6 +25,7 @@ CREATE TABLE productos (
     descripcion TEXT,
     marca VARCHAR(30),
     categoria VARCHAR(30),
+    estado ENUM('Disponible','No disponible','Inhabilitado'),
     stock INT DEFAULT 0,
     stock_minimo INT DEFAULT 0
 );

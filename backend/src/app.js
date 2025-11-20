@@ -18,7 +18,7 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 //Rutas
-app.use("/auth", auth);
+app.use("/api/auth", auth);
 app.use("/api/productos", productos);
 app.use("/api/entrada_insumo", entrada_insumo);
 app.use("/api/detalle_entrada", detalle_entrada);
