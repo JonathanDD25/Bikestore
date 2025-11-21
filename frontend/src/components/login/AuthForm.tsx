@@ -1,65 +1,57 @@
 import { useState } from "react";
-import "./auth.css";
+import { useAuth } from "../../Context/AuthContext";
 
 interface AuthFormProps {
-    mode: "login" | "register";
-    onSubmit: (data: { email: string; password: string; name?: string }) => void;
+  mode: "login";
 }
 
-export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
+export default function AuthForm({ mode }: AuthFormProps) {
+  const { login } = useAuth();
 
-    const isRegister = mode === "register";
+  const [correo, setCorreo] = useState("");
+  const [password, setPassword] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const data: any = { email, password };
-        if (isRegister) data.name = name;
-        onSubmit(data);
-    };
+  const [error, setError] = useState("");
 
-    return (
-        <form className="auth-form" onSubmit={handleSubmit}>
-            {isRegister && (
-                <div className="auth-input-group">
-                    <label htmlFor="name">Nombre</label>
-                    <input
-                        id="name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                </div>
-            )}
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-            <div className="auth-input-group">
-                <label htmlFor="email">Correo</label>
-                <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-            </div>
+    const result = await login(correo, password);
 
-            <div className="auth-input-group">
-                <label htmlFor="password">Contraseña</label>
-                <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-            </div>
+    if (!result.ok) {
+      setError(result.error || "Error desconocido");
+      return;
+    }
 
-            <button className="auth-btn" type="submit">
-                {isRegister ? "Registrarse" : "Iniciar sesión"}
-            </button>
-        </form>
-    );
+    // Login exitoso
+    console.log("Usuario autenticado!");
+  };
+
+  return (
+    <form className="auth-form" onSubmit={handleSubmit}>
+
+      {error && <p className="auth-error">{error}</p>}
+
+      <input
+        type="email"
+        placeholder="Correo"
+        value={correo}
+        onChange={(e) => setCorreo(e.target.value)}
+        required
+      />
+
+      <input
+        type="password"
+        placeholder="Contraseña"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+
+      <button type="submit" className="auth-button">
+        Iniciar Sesión
+      </button>
+    </form>
+  );
 }
