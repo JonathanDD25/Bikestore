@@ -1,46 +1,55 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
+import type { ReactNode } from "react";
 import { loginRequest } from "../services/authService";
-import type { LoginCredentials, LoginResponse } from "../services/authService";
 
 interface AuthContextProps {
     user: any;
     token: string | null;
-    login: (credentials: LoginCredentials) => Promise<void>;
+    login: (credenciales: any) => Promise<void>;
     logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextProps | null>(null);
+const AuthContext = createContext<AuthContextProps>({
+    user: null,
+    token: null,
+    login: async () => {},
+    logout: () => {},
+});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+interface AuthProviderProps {
+    children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<any>(null);
     const [token, setToken] = useState<string | null>(null);
 
-    // 🔥 Cargar sesión al iniciar la app
+    // --- Mantener sesión iniciada ---
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
-        const savedUser = localStorage.getItem("user");
+        const savedUser = localStorage.getItem("usuario");
 
-        if (savedToken) setToken(savedToken);
-        if (savedUser) setUser(JSON.parse(savedUser));
+        if (savedToken && savedUser) {
+            setToken(savedToken);
+            setUser(JSON.parse(savedUser));
+        }
     }, []);
 
-    // 🔥 LOGIN
-    const login = async (credentials: LoginCredentials) => {
-        const response: LoginResponse = await loginRequest(credentials);
+    const login = async (credentials: any) => {
+        const response = await loginRequest(credentials);
 
-        setToken(response.token);
         setUser(response.usuario);
+        setToken(response.token);
 
         localStorage.setItem("token", response.token);
-        localStorage.setItem("user", JSON.stringify(response.usuario));
+        localStorage.setItem("usuario", JSON.stringify(response.usuario));
     };
 
-    // 🔥 LOGOUT
     const logout = () => {
-        setToken(null);
         setUser(null);
+        setToken(null);
         localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        localStorage.removeItem("usuario");
     };
 
     return (
@@ -50,8 +59,5 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-export const useAuth = () => {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error("useAuth debe usarse dentro de AuthProvider");
-    return ctx;
-};
+
+export const useAuth = () => useContext(AuthContext);

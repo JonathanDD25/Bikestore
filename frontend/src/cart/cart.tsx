@@ -5,7 +5,13 @@
 import React, { useState } from "react";
 import "./cart.css";
 import CheckoutModal from "./CheckoutModal";
-import type { User } from "../context/AuthContext";
+// import type { User } from "../context/AuthContext";
+
+type User = {
+  id: number;
+  name: string;
+  email?: string;
+};
 
 export interface CartItem {
   id: number;

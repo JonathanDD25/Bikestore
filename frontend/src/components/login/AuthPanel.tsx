@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import AuthHeader from "./AuthHeader";
 import AuthForm from "./AuthForm";
+import { useAuth } from "../../context/AuthContext";
 import "./auth.css";
 
 import { crearUsuario } from "../../services/usuarioService";
-import { loginRequest } from "../../services/authService"
 
 interface AuthPanelProps {
     isOpen: boolean;
@@ -13,6 +13,8 @@ interface AuthPanelProps {
 
 export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
     const [mode, setMode] = useState<"login" | "register">("login");
+
+    const { login } = useAuth(); // ✔ usamos login del contexto
 
     const handleSubmit = async (data: any) => {
         try {
@@ -31,29 +33,26 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
 
                 alert("Cuenta creada correctamente");
                 setMode("login");
-            } 
+            }
+
             if (mode === "login") {
                 console.log("Login:", data);
-                const loginUsuario = {
+
+                const credenciales = {
                     correo: data.email,
                     clave: data.password,
                 };
 
-                const login = await loginRequest(loginUsuario);
-                console.log("Usuario logeado:", login);
+                // ✔ Ahora usamos login() del contexto
+                await login(credenciales);
 
-                localStorage.setItem("token", login.token);
-                localStorage.setItem("usuario", JSON.stringify(login.usuario));
-
-                console.log("LocalStorage:", login.token);
-                console.log("LocalStorage:", login.usuario);
-                alert("Simulando inicio de sesión...");
+                console.log("Usuario logeado correctamente");
 
                 onClose();
             }
         } catch (error: any) {
             console.error(error);
-            alert(error.message);
+            alert(error.message || "Hubo un error inesperado");
         }
     };
 

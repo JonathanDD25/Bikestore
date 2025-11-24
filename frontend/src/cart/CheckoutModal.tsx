@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import "./CheckoutModal.css";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 // ============================================================
 // Tipos e interfaces
@@ -45,7 +45,7 @@ export default function CheckoutModal({
   setCartItems,
 }: CheckoutModalProps) {
   
-  const { usuarioLogin } = useAuth();
+  const { user } = useAuth();
 
   // ============================================================
   // ❗ FIX: Solo mostrar "carrito vacío" si el paso es 1
@@ -174,7 +174,7 @@ export default function CheckoutModal({
   const handlePayment = async () => {
 
     // ✔ FIX DE USUARIO NO IDENTIFICADO
-    if (!usuarioLogin || !usuarioLogin.id) {
+    if (!user || !user.id) {
       return Swal.fire({
         icon: "error",
         title: "Usuario no identificado",
@@ -192,7 +192,7 @@ export default function CheckoutModal({
     }
 
     const orderPayload = {
-      id_usuario: usuarioLogin.id, // ✔ FIX REAL
+      id_usuario: user.id, // ✔ FIX REAL
       metodo_pago: paymentMethod,
       descripcion: "Compra desde Checkout",
       productos: cartItems.map((item) => ({

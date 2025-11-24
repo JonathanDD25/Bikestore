@@ -10,14 +10,16 @@ import CartPanel from "../../cart/cart";
 import AuthPanel from "../login/AuthPanel";
 import Footer from "../layout/footer";
 import AppRoutes from "../../routes/Routes";
+import ProfilePanel from "../perfil/perfilPanel"
 
 export default function Layout() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const { cartItems, setCartItems, addToCart, count } = useCart();
   const { toast, showToast } = useToast();
-  const { user, logout } = useAuth();   // 🔥 usuarioLogin → user
+  const { user, logout } = useAuth();
 
   const handleAddToCart = (item: any) => {
     addToCart(item);
@@ -31,8 +33,14 @@ export default function Layout() {
       <Header
         cartCount={count}
         onCartClick={() => setIsCartOpen(true)}
-        onLoginClick={() => setIsLoginOpen(true)}
-        usuarioLogin={!!user}     // 🔥 corregido
+        onLoginClick={() => {
+          if (user) {
+            setIsProfileOpen(true);  // 🔥 abrir panel de perfil
+          } else {
+            setIsLoginOpen(true);    // 🔥 abrir panel de login
+          }
+        }}
+        usuarioLogin={!!user}
         onLogout={logout}
       />
 
@@ -47,8 +55,13 @@ export default function Layout() {
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
         setCartItems={setCartItems}
-        usuarioLogin={user}      // 🔥 corregido
+        usuarioLogin={user}
         onLoginRequest={() => setIsLoginOpen(true)}
+      />
+
+      <ProfilePanel
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
       />
 
       <AuthPanel
