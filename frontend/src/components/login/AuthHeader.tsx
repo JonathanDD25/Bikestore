@@ -2,16 +2,23 @@ import React from "react";
 import "./auth.css";
 
 interface AuthHeaderProps {
-    title: string;
-    subtitle?: string;
+    mode: "login" | "register";
+    title: string; 
+    onClose: () => void;
+    onSwitchMode: () => void;
 }
 
-const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
+const AuthHeader: React.FC<AuthHeaderProps> = ({ mode, onClose, onSwitchMode }) => {
     return (
-        <header className="auth-header">
-            <h2 className="auth-title">{title}</h2>
-            {subtitle && <p className="auth-subtitle">{subtitle}</p>}
-        </header>
+        <div className="auth-header">
+            <h2>{mode === "login" ? "Iniciar sesión" : "Crear cuenta"}</h2>
+
+            <button className="auth-switch-btn" onClick={onSwitchMode}>
+                {mode === "login" ? "Registrarse" : "Iniciar sesión"}
+            </button>
+
+            <button className="auth-close-btn" onClick={onClose}>✖</button>
+        </div>
     );
 };
 

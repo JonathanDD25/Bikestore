@@ -7,7 +7,7 @@ interface HeaderProps {
   onLoginClick: () => void;
   onLogout?: () => void;
   cartCount: number;
-  usuarioLogin: boolean;
+  usuarioLogin: boolean;   // 🔥 este es el correcto
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -20,17 +20,14 @@ const Header: React.FC<HeaderProps> = ({
     <header className="component-header">
       <div className="component-top-header">
 
-        {/* LOGO */}
         <div className="component-logo">
           <a href="/">
             <span>Bike</span>Store
           </a>
         </div>
 
-        {/* BOTONES */}
         <div className="component-header-actions">
 
-          {/* LOGIN */}
           <button
             className="component-login-btn"
             onClick={onLoginClick}
@@ -42,18 +39,13 @@ const Header: React.FC<HeaderProps> = ({
             <span>{usuarioLogin ? "Perfil" : "Ingresar"}</span>
           </button>
 
-          {/* CARRITO */}
           <button
             className="component-cart-btn"
             onClick={onCartClick}
             title="Carrito"
           >
             <FaShoppingCart />
-            <span
-              className={`component-cart-count ${
-                cartCount > 0 ? "bump" : ""
-              }`}
-            >
+            <span className={`component-cart-count ${cartCount > 0 ? "bump" : ""}`}>
               {cartCount}
             </span>
           </button>

@@ -1,57 +1,114 @@
-import { useState } from "react";
-import { useAuth } from "../../Context/AuthContext";
+import React, { useState } from "react";
 
 interface AuthFormProps {
-  mode: "login";
+    mode: "login" | "register";
+    onSubmit: (data: {
+        name?: string;
+        lastName?: string;
+        phone?: string;
+        email: string;
+        password: string;
+    }) => void;
 }
 
-export default function AuthForm({ mode }: AuthFormProps) {
-  const { login } = useAuth();
+export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
+    const [form, setForm] = useState({
+        name: "",
+        lastName: "",
+        phone: "",
+        email: "",
+        password: "",
+    });
 
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
-  const [error, setError] = useState("");
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit(form);
+    };
 
-    const result = await login(correo, password);
+    return (
+        <form className="auth-form" onSubmit={handleSubmit}>
 
-    if (!result.ok) {
-      setError(result.error || "Error desconocido");
-      return;
-    }
+            {/* Registrar: nombres */}
+            {mode === "register" && (
+                <>
+                    <div className="form-group">
+                        <label>Nombres</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            required={mode === "register"}
+                        />
+                    </div>
 
-    // Login exitoso
-    console.log("Usuario autenticado!");
-  };
+                    <div className="form-group">
+                        <label>Apellidos</label>
+                        <input
+                            type="text"
+                            name="lastName"
+                            value={form.lastName}
+                            onChange={handleChange}
+                            required={mode === "register"}
+                        />
+                    </div>
 
-  return (
-    <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Teléfono</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            required={mode === "register"}
+                        />
+                    </div>
+                </>
+            )}
 
-      {error && <p className="auth-error">{error}</p>}
+            {/* Email */}
+            <div className="form-group">
+                <label>Correo</label>
+                <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
 
-      <input
-        type="email"
-        placeholder="Correo"
-        value={correo}
-        onChange={(e) => setCorreo(e.target.value)}
-        required
-      />
+            {/* Password con toggle 👁 */}
+            <div className="form-group password-field">
+                <label>Contraseña</label>
+                <div className="password-wrapper">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                    />
+                    <button
+                        type="button"
+                        className="toggle-password"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        {showPassword ? "👁" : "👁"}
+                    </button>
+                </div>
+            </div>
 
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-
-      <button type="submit" className="auth-button">
-        Iniciar Sesión
-      </button>
-    </form>
-  );
+            {/* Botón principal */}
+            <button className="auth-btn" type="submit">
+                {mode === "login" ? "Iniciar Sesión" : "Crear Cuenta"}
+            </button>
+        </form>
+    );
 }

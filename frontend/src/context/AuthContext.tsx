@@ -1,104 +1,57 @@
-// src/context/authContext.tsx
-import { createContext, useContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
-// ============================================================
-//  INTERFAZ DEL USUARIO DEL BACKEND
-// ============================================================
-export interface User {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  rol: string; // viene del backend
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { loginRequest } from "../services/authService";
+import type { LoginCredentials, LoginResponse } from "../services/authService";
+
+interface AuthContextProps {
+    user: any;
+    token: string | null;
+    login: (credentials: LoginCredentials) => Promise<void>;
+    logout: () => void;
 }
 
-// ============================================================
-//  INTERFAZ DEL CONTEXTO DE AUTENTICACIÓN
-// ============================================================
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
+const AuthContext = createContext<AuthContextProps | null>(null);
 
-  login: (correo: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  logout: () => void;
-}
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const [user, setUser] = useState<any>(null);
+    const [token, setToken] = useState<string | null>(null);
 
-// ============================================================
-//  CREACIÓN DEL CONTEXTO
-// ============================================================
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+    // 🔥 Cargar sesión al iniciar la app
+    useEffect(() => {
+        const savedToken = localStorage.getItem("token");
+        const savedUser = localStorage.getItem("user");
 
-// ============================================================
-//  PROVIDER
-// ============================================================
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
-  });
+        if (savedToken) setToken(savedToken);
+        if (savedUser) setUser(JSON.parse(savedUser));
+    }, []);
 
-  const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem("token") || null;
-  });
+    // 🔥 LOGIN
+    const login = async (credentials: LoginCredentials) => {
+        const response: LoginResponse = await loginRequest(credentials);
 
-  // Guardar datos cuando cambian
-  useEffect(() => {
-    if (token) localStorage.setItem("token", token);
-    else localStorage.removeItem("token");
-  }, [token]);
+        setToken(response.token);
+        setUser(response.usuario);
 
-  useEffect(() => {
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    else localStorage.removeItem("user");
-  }, [user]);
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.usuario));
+    };
 
-  // ------------------------------------------------------------
-  // LOGIN: consume el API, guarda token y usuario
-  // ------------------------------------------------------------
-  const login = async (correo: string, password: string) => {
-    try {
-      const response = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo, password }),
-      });
+    // 🔥 LOGOUT
+    const logout = () => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+    };
 
-      if (!response.ok) {
-        return { ok: false, error: "Credenciales incorrectas" };
-      }
-
-      const data = await response.json();
-
-      setToken(data.token);
-      setUser(data.usuario);
-
-      return { ok: true };
-    } catch (error) {
-      return { ok: false, error: "Error al conectar con el servidor" };
-    }
-  };
-
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider value={{ user, token, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
-// ============================================================
-//  CUSTOM HOOK
-// ============================================================
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de un AuthProvider");
-  }
-  return context;
+export const useAuth = () => {
+    const ctx = useContext(AuthContext);
+    if (!ctx) throw new Error("useAuth debe usarse dentro de AuthProvider");
+    return ctx;
 };

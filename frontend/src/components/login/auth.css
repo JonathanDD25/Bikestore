@@ -132,6 +132,50 @@
     gap: 14px;
 }
 
+/* Campos */
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.auth-password-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.auth-show-pass {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.auth-submit-btn {
+    margin-top: 10px;
+    padding: 10px;
+    background: #0074ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.auth-switch-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0074ff;
+}
+
+.auth-close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 .auth-form label {
     font-size: 0.85rem;
     color: var(--color-secondary);

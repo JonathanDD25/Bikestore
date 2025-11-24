@@ -9,7 +9,7 @@ CREATE TABLE usuario (
     apellidos VARCHAR(50),
     correo VARCHAR(100) UNIQUE,
     clave VARCHAR(255),
-    rol ENUM('Administrador', 'Operario', 'Cliente', 'Inhabilitado'),
+    rol ENUM('Administrador', 'Operario', 'Cliente', 'Inhabilitado') DEFAULT 'Cliente',
     direccion VARCHAR(150),
     telefono VARCHAR(20)
 );

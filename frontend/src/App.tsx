@@ -1,8 +1,16 @@
-import AppRutas from "./routes/Routes";
-import { useCart } from "./hooks/useCart";
+import "./assets/styles.css";
+import { CartProvider } from "../src/context/CartContext";
+import { AuthProvider } from "../src/context/AuthContext";
+import Layout from "./components/layout/Layout";
+import Toast from "./components/toast/toast";
 
-export const App = () => {
-  const { addToCart } = useCart();
-
-  return <AppRutas onAddToCart={addToCart} />;
-};
+export default function App() {
+  return (
+      <AuthProvider>
+        <CartProvider>
+          <Layout />
+          <Toast />
+        </CartProvider>
+      </AuthProvider>
+  );
+}
