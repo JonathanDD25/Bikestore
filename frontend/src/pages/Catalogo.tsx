@@ -15,7 +15,7 @@ interface CatalogoProps {
   categoria?: string;
 }
 
-export default function Catalogo({ onAddToCart, categoria = "montaña" }: CatalogoProps) {
+export default function Catalogo({ onAddToCart, categoria }: CatalogoProps) {
   const { products, loading, error } = useProducts(categoria);
 
   if (loading) return <p>Cargando productos...</p>;
@@ -24,7 +24,7 @@ export default function Catalogo({ onAddToCart, categoria = "montaña" }: Catalo
   return (
     <div className="bs-page-root">
       <header className="bs-header-section">
-        <h1>{categoria.charAt(0).toUpperCase() + categoria.slice(1)} 🚴‍♂️</h1>
+        <h1>{categoria ? categoria.charAt(0).toUpperCase() + categoria.slice(1) : "Catálogo"} 🚴‍♂️</h1>
         <p>¡Bienvenido a Bike Store! Descubre productos pensados para potenciar tu ruta y llevar tu experiencia al siguiente nivel.</p>
       </header>
 

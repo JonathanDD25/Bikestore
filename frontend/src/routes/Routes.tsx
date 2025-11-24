@@ -2,7 +2,6 @@
  * ============================================================
  * ROUTES: Definición de rutas de la aplicación 
  * ============================================================
- * Autor: Bryan David López Campos
  */
 
 import React from "react";
@@ -41,9 +40,7 @@ const AppRutas: React.FC<RoutesProps> = ({ onAddToCart }) => {
     <Routes>
 
       {/* Catálogo principal */}
-      <Route
-        path="/"
-        element={<Catalogo categoria="montaña" onAddToCart={onAddToCart} />}
+      <Route path="/" element={<Catalogo onAddToCart={onAddToCart} />}
       />
 
       {/* Catálogos dinámicos */}

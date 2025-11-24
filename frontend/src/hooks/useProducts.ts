@@ -9,14 +9,12 @@ function normalizeCategory(cat: string) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-export function useProducts(categoria: string) {
+export function useProducts(categoria?: string) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!categoria || categoria.trim() === "") return;
-
     const controller = new AbortController();
 
     const fetchProducts = async () => {
@@ -24,8 +22,13 @@ export function useProducts(categoria: string) {
         setLoading(true);
         setError(null);
 
-        const cat = normalizeCategory(categoria);
-        const url = `http://localhost:3000/api/productos/${encodeURIComponent(cat)}`;
+        let url = "http://localhost:3000/api/productos";
+
+        // Si hay categoría, usar endpoint con categoría
+        // if (categoria && categoria.trim() !== "") {
+        //   const cat = normalizeCategory(categoria);
+        //   url += `/${encodeURIComponent(cat)}`;
+        // }
 
         const res = await fetch(url, { signal: controller.signal });
 
@@ -41,18 +44,21 @@ export function useProducts(categoria: string) {
           throw new Error("La respuesta del servidor no es un arreglo válido.");
         }
 
-        const mapped: Product[] = data.map((p) => ({
-          id_producto: Number(p.id_producto),
-          nombre: p.nombre ?? "",
-          precio: Number(p.precio),
-          image: p.image ?? "",
-          descripcion: p.descripcion ?? "",
-          marca: p.marca ?? "",
-          estado: p.estado ?? "",
-          categoria: p.categoria ?? "",
-          stock: Number(p.stock),
-          stock_minimo: Number(p.stock_minimo),
-        }));
+        // Mapear y filtrar DISPONIBLES
+        const mapped: Product[] = data
+          .map((p) => ({
+            id_producto: Number(p.id_producto),
+            nombre: p.nombre ?? "",
+            precio: Number(p.precio),
+            image: p.image ?? "",
+            descripcion: p.descripcion ?? "",
+            marca: p.marca ?? "",
+            estado: p.estado ?? "",
+            categoria: p.categoria ?? "",
+            stock: Number(p.stock),
+            stock_minimo: Number(p.stock_minimo),
+          }))
+          .filter((p) => p.estado === "Disponible");
 
         setProducts(mapped);
 
