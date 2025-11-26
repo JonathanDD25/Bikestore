@@ -1,11 +1,11 @@
 // ============================================================
-//  COMPONENTE: CartPanel 
+//  COMPONENTE: CartPanel (SIN MODAL - SOLO VISUAL)
 // ============================================================
 
-import React, { useState } from "react";
+import React from "react";
 import "./cart.css";
-import CheckoutModal from "./CheckoutModal";
-// import type { User } from "../context/AuthContext";
+import { realizarCompra } from "../services/compraService";
+import { useCart } from "../context/CartContext";
 
 type User = {
   id: number;
@@ -17,8 +17,7 @@ export interface CartItem {
   id: number;
   name: string;
   price: number;
-  oldPrice?: number;
-  image: string;
+  image?: string;
   quantity: number;
   discount?: number;
 }
@@ -28,8 +27,8 @@ interface CartPanelProps {
   onClose: () => void;
   cartItems: CartItem[];
   setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
-  usuarioLogin: User | null;
-  setUsuarioLogin?: React.Dispatch<React.SetStateAction<User | null>>;
+  clearCart: () => void;
+  usuarioLogin: { id: number;[key: string]: any } | null;
   onLoginRequest: (mode?: "login" | "register") => void;
 }
 
@@ -38,28 +37,65 @@ export default function CartPanel({
   onClose,
   cartItems,
   setCartItems,
+  clearCart,
   usuarioLogin,
   onLoginRequest,
 }: CartPanelProps) {
 
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-
-  // 🔄 Cantidades
+  // ============================
+  // Cantidades
+  // ============================
   const changeQuantity = (id: number, delta: number) => {
     setCartItems(items =>
       items.map(item =>
         item.id === id
-          ? { ...item, quantity: Math.max(1, Math.min(20, item.quantity + delta)) }
+          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
           : item
       )
     );
   };
 
-  // 🗑️ Eliminar
+  const handleCompra = async () => {
+    if (!usuarioLogin) {
+      alert("Debes iniciar sesión para comprar");
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      alert("El carrito está vacío");
+      return;
+    }
+
+    try {
+      // console.log("productos del pedido", cartItems)
+      // console.log("Usuario que realiza el pedido:",usuarioLogin)
+      // console.log("ID Usuario que realiza el pedido:", usuarioLogin.id)
+      await realizarCompra(usuarioLogin.id, cartItems);
+
+      alert("¡Compra realizada con éxito!");
+
+      clearCart(); // ← vacía el carrito
+      onClose();   // ← cierra el modal si quieres
+
+    } catch (error) {
+      console.error("Error al procesar la compra:", error);
+      alert("Hubo un error al procesar la compra.");
+    }
+  };
+
+
+  // ============================
+  // Eliminar item
+  // ============================
   const removeItem = (id: number) =>
     setCartItems(items => items.filter(item => item.id !== id));
 
-  // 💰 Totales
+  // ============================
+  // LIMPIAR CARRITO
+  // ============================
+  // ============================
+  // Totales
+  // ============================
   const subtotal = cartItems.reduce(
     (acc, i) => acc + i.price * i.quantity,
     0
@@ -67,32 +103,17 @@ export default function CartPanel({
 
   const discount = cartItems.reduce(
     (acc, item) =>
-      item.discount
-        ? acc + (item.price * item.quantity * item.discount) / 100
-        : acc,
+      item.discount ? acc + (item.price * item.quantity * item.discount) / 100 : acc,
     0
   );
 
-  const shipping = subtotal > 0 ? 15000 : 0;
-  const total = subtotal - discount + shipping;
+  const total = subtotal - discount;
 
-  // 🧾 Checkout con login 
+  // ============================
+  // BOTÓN COMPRAR (sin acción)
+  // ============================
   const checkoutHandler = () => {
-    if (!usuarioLogin) {
-      // Cerrar carrito
-      onClose();
-
-      // Abrir AutPanel sin solaparse
-      setTimeout(() => {
-        onLoginRequest("login");
-      }, 300);
-
-      return;
-    }
-
-    // Usuario autenticado
-    onClose();
-    setIsCheckoutOpen(true);
+    console.log("Comprar presionado — por ahora sin acción.");
   };
 
   return (
@@ -121,11 +142,6 @@ export default function CartPanel({
 
                 <div className="cart-item-info">
                   <h3>{item.name}</h3>
-
-                  {item.oldPrice && (
-                    <p className="old-price">${item.oldPrice.toLocaleString()}</p>
-                  )}
-
                   <p className="price">${item.price.toLocaleString()}</p>
 
                   <div className="quantity-control">
@@ -144,52 +160,46 @@ export default function CartPanel({
         </div>
 
         {/* FOOTER */}
-        <div className="cart-footer">
-          <div className="summary-line">
-            <span>Subtotal:</span>
-            <strong>${subtotal.toLocaleString()}</strong>
-          </div>
+        {cartItems.length > 0 && (
+          <div className="cart-footer">
 
-          {discount > 0 && (
-            <div className="summary-line discount">
-              <span>Descuento:</span>
-              <strong>- ${discount.toLocaleString()}</strong>
+            {/* BOTÓN LIMPIAR */}
+            <button className="clear-cart-btn" onClick={clearCart}>
+              Limpiar carrito
+            </button>
+
+            <div className="summary-line">
+              <span>Subtotal:</span>
+              <strong>${subtotal.toLocaleString()}</strong>
             </div>
-          )}
 
-          <div className="summary-line">
-            <span>Envío:</span>
-            <strong>${shipping.toLocaleString()}</strong>
+            {discount > 0 && (
+              <div className="summary-line discount">
+                <span>Descuento:</span>
+                <strong>- ${discount.toLocaleString()}</strong>
+              </div>
+            )}
+
+            <hr />
+
+            <div className="summary-total">
+              <span>Total:</span>
+              <strong>${total.toLocaleString()}</strong>
+            </div>
+
+            <button
+              className="checkout-btn"
+              disabled={cartItems.length === 0}
+              onClick={handleCompra}
+            >
+              Comprar
+            </button>
+
           </div>
-
-          <hr />
-
-          <div className="summary-total">
-            <span>Total:</span>
-            <strong>${total.toLocaleString()}</strong>
-          </div>
-
-          <button
-            className="checkout-btn"
-            disabled={cartItems.length === 0}
-            onClick={checkoutHandler}
-          >
-            {usuarioLogin ? "Continuar compra" : "REALIZAR PEDIDO"}
-          </button>
-        </div>
+        )}
       </aside>
 
-      {/* OVERLAY */}
       {isOpen && <div className="overlay active" onClick={onClose}></div>}
-
-      {/* MODAL CHECKOUT */}
-      {isCheckoutOpen && usuarioLogin && (
-        <CheckoutModal
-          onClose={() => setIsCheckoutOpen(false)}
-          cartItems={cartItems}
-          setCartItems={setCartItems}
-        />
-      )}
     </>
   );
 }

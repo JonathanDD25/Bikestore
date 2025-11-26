@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useCart } from "../../hooks/useCart";
+import { useCart } from "../../context/CartContext";   // ⬅️ CAMBIO CLAVE
 import { useToast } from "../../hooks/useToast";
 import { useAuth } from "../../context/AuthContext";
+import clearCart from "../../cart/cart"
 
 import HeaderTop from "../layout/HeaderTop";
 import Header from "../layout/header";
@@ -10,14 +11,16 @@ import CartPanel from "../../cart/cart";
 import AuthPanel from "../login/AuthPanel";
 import Footer from "../layout/footer";
 import AppRoutes from "../../routes/Routes";
-import ProfilePanel from "../perfil/perfilPanel"
+import ProfilePanel from "../perfil/perfilPanel";
 
 export default function Layout() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const { cartItems, setCartItems, addToCart, count } = useCart();
+  // ✔ Ahora usamos el carrito REAL del CartContext
+  const { cartItems, setCartItems, addToCart, count, clearCart } = useCart();
+
   const { toast, showToast } = useToast();
   const { user, logout } = useAuth();
 
@@ -35,9 +38,9 @@ export default function Layout() {
         onCartClick={() => setIsCartOpen(true)}
         onLoginClick={() => {
           if (user) {
-            setIsProfileOpen(true);  // 🔥 abrir panel de perfil
+            setIsProfileOpen(true);
           } else {
-            setIsLoginOpen(true);    // 🔥 abrir panel de login
+            setIsLoginOpen(true);
           }
         }}
         usuarioLogin={!!user}
@@ -55,6 +58,7 @@ export default function Layout() {
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
         setCartItems={setCartItems}
+        clearCart={clearCart}
         usuarioLogin={user}
         onLoginRequest={() => setIsLoginOpen(true)}
       />
@@ -66,7 +70,7 @@ export default function Layout() {
 
       <AuthPanel
         isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}   // 🔥 ahora funciona
+        onClose={() => setIsLoginOpen(false)}
       />
 
       <Footer />

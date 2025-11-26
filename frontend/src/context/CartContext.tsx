@@ -30,14 +30,15 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem("cartItems");
+    const saved = localStorage.getItem("carrito");
     return saved ? JSON.parse(saved) : [];
   });
 
   // Guardar en localStorage
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    localStorage.setItem("carrito", JSON.stringify(cartItems));
   }, [cartItems]);
+
 
   // ============================================================
   //  FUNCIONES DEL CARRITO
@@ -61,7 +62,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const clearCart = () => setCartItems([]); 
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem("carrito");
+  };
 
   return (
     <CartContext.Provider

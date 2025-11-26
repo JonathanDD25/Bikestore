@@ -20,7 +20,6 @@ export default function Catalogo({ onAddToCart, categoria }: CatalogoProps) {
 
   if (loading) return <p>Cargando productos...</p>;
   if (error) return <p>Error: {error}</p>;
-
   return (
     <div className="bs-page-root">
       <header className="bs-header-section">

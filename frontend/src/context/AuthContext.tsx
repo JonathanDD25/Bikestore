@@ -12,8 +12,8 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps>({
     user: null,
     token: null,
-    login: async () => {},
-    logout: () => {},
+    login: async () => { },
+    logout: () => { },
 });
 
 interface AuthProviderProps {
@@ -38,11 +38,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const login = async (credentials: any) => {
         const response = await loginRequest(credentials);
 
-        setUser(response.usuario);
+        const usuarioNormalizado = {
+            id_usuario: response.usuario.id_usuario,   // 🔥 aquí haces el cambio correcto
+            nombres: response.usuario.nombres,
+            apellidos: response.usuario.apellidos,
+            rol: response.usuario.rol
+        };
+
+        setUser(usuarioNormalizado);
         setToken(response.token);
 
         localStorage.setItem("token", response.token);
-        localStorage.setItem("usuario", JSON.stringify(response.usuario));
+        localStorage.setItem("usuario", JSON.stringify(usuarioNormalizado));
     };
 
     const logout = () => {
