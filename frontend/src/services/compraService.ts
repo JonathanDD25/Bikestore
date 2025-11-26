@@ -27,11 +27,8 @@ export const realizarCompra = async (
             id_usuario: userId,
             precio_total
         };
-        console.log("Pedido que recibe el backend:", pedido);
         const pedidoCreado = await agregarPedido(pedido);
-        console.log("Pedido que devuelve el backend:", pedidoCreado);
         const id_pedido = pedidoCreado.id_pedido!;
-        console.log("ID Pedido creado:", id_pedido);
 
         // 3️⃣ Crear cada detalle del pedido
         for (const item of cartItems) {
@@ -41,8 +38,6 @@ export const realizarCompra = async (
                 cantidad: item.quantity,
                 precio_unitario: item.price
             };
-
-            console.log("📦 Enviando detalle:", detalle);
 
             await agregarDetallePedido(detalle);
         }

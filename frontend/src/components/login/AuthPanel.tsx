@@ -36,7 +36,6 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
             }
 
             if (mode === "login") {
-                console.log("Login:", data);
 
                 const credenciales = {
                     correo: data.email,

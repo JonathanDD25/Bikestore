@@ -9,7 +9,7 @@ export interface LoginCredentials {
 export interface LoginResponse {
     token: string;
     usuario: {
-        id_usuario: number;
+        id: number;
         nombres: string;
         apellidos: string;
         correo: string;
@@ -25,7 +25,6 @@ export const loginRequest = async (credentials: LoginCredentials): Promise<Login
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
     });
-
     if (!res.ok) {
         // Puedes ver detalles si el backend envía mensaje de error
         const errorMessage = await res.text();

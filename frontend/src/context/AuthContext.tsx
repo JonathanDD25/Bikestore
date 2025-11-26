@@ -39,7 +39,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const response = await loginRequest(credentials);
 
         const usuarioNormalizado = {
-            id_usuario: response.usuario.id_usuario,   // 🔥 aquí haces el cambio correcto
+            // 🔥 CORRECCIÓN: Usar 'response.usuario.id' para mapearlo a 'id_usuario'
+            id_usuario: response.usuario.id,
             nombres: response.usuario.nombres,
             apellidos: response.usuario.apellidos,
             rol: response.usuario.rol

@@ -7,11 +7,11 @@ import "./cart.css";
 import { realizarCompra } from "../services/compraService";
 import { useCart } from "../context/CartContext";
 
-type User = {
-  id: number;
-  name: string;
-  email?: string;
-};
+// type User = {
+//   id: number;
+//   name: string;
+//   email?: string;
+// };
 
 export interface CartItem {
   id: number;
@@ -28,7 +28,7 @@ interface CartPanelProps {
   cartItems: CartItem[];
   setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
   clearCart: () => void;
-  usuarioLogin: { id: number;[key: string]: any } | null;
+  usuarioLogin: { id_usuario: number;[key: string]: any } | null;
   onLoginRequest: (mode?: "login" | "register") => void;
 }
 
@@ -70,7 +70,7 @@ export default function CartPanel({
       // console.log("productos del pedido", cartItems)
       // console.log("Usuario que realiza el pedido:",usuarioLogin)
       // console.log("ID Usuario que realiza el pedido:", usuarioLogin.id)
-      await realizarCompra(usuarioLogin.id, cartItems);
+      await realizarCompra(usuarioLogin.id_usuario, cartItems);
 
       alert("¡Compra realizada con éxito!");
 
