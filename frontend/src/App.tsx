@@ -1,9 +1,16 @@
-import { AppRutas } from "./routes/appRutas";
+import "./assets/styles.css";
+import { CartProvider } from "../src/context/CartContext";
+import { AuthProvider } from "../src/context/AuthContext";
+import Layout from "./components/layout/Layout";
+import Toast from "./components/toast/toast";
 
-export const App = () => {
+export default function App() {
   return (
-    <>
-      <AppRutas/>
-    </>
+      <AuthProvider>
+        <CartProvider>
+          <Layout />
+          <Toast />
+        </CartProvider>
+      </AuthProvider>
   );
-};
+}

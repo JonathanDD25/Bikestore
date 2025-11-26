@@ -2,60 +2,92 @@ import { pool } from '../config/connection.js'
 
 export class CrudController {
     // Obtiene todos los registros de una tabla
-    async obtenerTodos(tabla){
+    async obtenerTodos(tabla) {
         const [resultados] = await pool.query(`SELECT * FROM ??`, [tabla]);
         return resultados;
     }
 
 
-    async obtenerUno(tabla, idsCampos) {
-        try{
-            let where = [];
-            let values = [];
-
-            for (const campo in idsCampos) {
-                where.push(`${campo} = ?`);
-                values.push(idsCampos[campo]);
+    async obtenerUno(tabla, ids = {}) {
+        try {
+            const keys = Object.keys(ids).filter(k => ids[k] !== undefined);
+            if (keys.length === 0) {
+                throw new Error("No se proporcionaron IDs para obtenerUno");
             }
 
-            const resultado = `SELECT * FROM ${tabla} WHERE ${where.join(" AND ")}`;
-            const [rows] = await pool.query(resultado, values);
+            const whereClauses = keys.map(k => `${k} = ?`).join(" AND ");
+            const params = keys.map(k => ids[k]);
 
-            return rows;
+            const sql = `SELECT * FROM \`${tabla}\` WHERE ${whereClauses} LIMIT 1`;
+            const [rows] = await pool.query(sql, params);
 
-        } catch (error){
+            return rows[0] ?? null;
+        } catch (error) {
+            console.error("Error en crud.obtenerUno():", error);
             throw error;
         }
     }
-        
+
 
     //Crear un nuevo registro
-    async crear(tabla, idsCampos, data) {
+    async crear(tabla, idsCampos = {}, data) {
         try {
-            // Insertamos los datos
-            const [resultado] = await pool.query(`INSERT INTO ?? SET ?`, [tabla, data]);
+            // Limpiar datos (eliminar undefined para evitar SQL inválido)
+            const datosLimpios = {};
+            for (const k in data) {
+                if (data[k] !== undefined) datosLimpios[k] = data[k];
+            }
 
-            // Si la tabla tiene un ID autoincremental, lo agregamos al objeto idsCampos
-            // Esto aplica para tablas con una sola llave primaria (por ejemplo, productos)
-            if (resultado.insertId) {
-                const campoAuto = Object.keys(idsCampos)[0]; // suponemos que el primer campo es el autoincremental
-                idsCampos[campoAuto] = resultado.insertId;
+            if (Object.keys(datosLimpios).length === 0) {
+                throw new Error("No hay datos para insertar en " + tabla);
+            }
+
+            // Ejecutar INSERT
+            const [resultado] = await pool.query(`INSERT INTO ?? SET ?`, [tabla, datosLimpios]);
+
+            // Si el INSERT devolvió insertId (tabla con autoincrement)
+            if (resultado && resultado.insertId) {
+                // Nombre típico: id_<tabla>
+                const posibles = Object.keys(idsCampos);
+                if (posibles.length === 0) {
+                    // si no nos dieron idsCampos, asumir convención id_<tabla>
+                    const nombreId = `id_${tabla}`;
+                    idsCampos[nombreId] = resultado.insertId;
+                } else {
+                    // usar el primer campo provisto en idsCampos
+                    const campoAuto = posibles[0];
+                    idsCampos[campoAuto] = resultado.insertId;
+                }
             } else {
-                // Si no hay autoincremental, asumimos que los IDs están en "data"
-                for (const campo in data) {
-                    if (campo in idsCampos) {
-                        idsCampos[campo] = data[campo];
-                    }
+                // No hubo insertId: es probable que la PK venga en data (claves compuestas)
+                // Copiar valores desde datosLimpios a idsCampos si existe la clave
+                for (const k in idsCampos) {
+                    if (datosLimpios[k] !== undefined) idsCampos[k] = datosLimpios[k];
                 }
             }
 
-            // Devolvemos el registro recién insertado
-            return await this.obtenerUno(tabla, idsCampos);
+            // Verificar que idsCampos tenga valores válidos para construir WHERE
+            const whereKeys = Object.keys(idsCampos).filter(k => idsCampos[k] !== undefined);
+            if (whereKeys.length === 0) {
+                // No tenemos cómo recuperar el registro; devolvemos un resultado básico
+                return { insertId: resultado.insertId || null, ...datosLimpios };
+            }
+
+            // Construir consulta para obtener el registro insertado
+            const whereClauses = whereKeys.map(k => `${k} = ?`).join(" AND ");
+            const whereValues = whereKeys.map(k => idsCampos[k]);
+
+            const sql = `SELECT * FROM \`${tabla}\` WHERE ${whereClauses} LIMIT 1`;
+            const [rows] = await pool.query(sql, whereValues);
+
+            return rows[0] ?? { insertId: resultado.insertId || null, ...datosLimpios };
+
         } catch (error) {
+            console.error("Error en crud.crear():", error);
             throw error;
         }
     }
-    
+
     //Actualizar un registro por ID
     async actualizar(tabla, idsCampos, data) {
         try {
@@ -90,7 +122,7 @@ export class CrudController {
         }
     }
     //Eliminar un registro por ID
-    async eliminar(tabla, idsCampos){
+    async eliminar(tabla, idsCampos) {
         try {
             let where = [];
             let values = [];
@@ -99,13 +131,13 @@ export class CrudController {
                 where.push(`${campo} = ?`);
                 values.push(idsCampos[campo]);
             }
-            const resultado =  await pool.query(`DELETE FROM ${tabla} WHERE ${where.join(" AND ")}`, values);
-            
+            const resultado = await pool.query(`DELETE FROM ${tabla} WHERE ${where.join(" AND ")}`, values);
+
             if (resultado.affectedRows === 0) {
                 throw new Error('Registro no encontrado');
             }
             return { message: 'Registro eliminado exitosamente' };
-        } catch (error){
+        } catch (error) {
             throw error;
         }
     }
