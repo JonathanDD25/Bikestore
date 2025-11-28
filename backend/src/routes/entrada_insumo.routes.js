@@ -1,62 +1,16 @@
 import express from "express";
-import { CrudController } from "../controllers/crud.controller.js";
+import { Entrada_insumoController } from "../controllers/entrada_insumo.controller.js";
 
 const router = express.Router();
-const crud = new CrudController();
+const insumoController = new Entrada_insumoController();
 
 const tabla = 'entrada_insumo';
 
 //Rutas para operaciones CRUD
-router.get("/", async (req, res) => {
-    try {
-        const dato = await crud.obtenerTodos(tabla);
-        res.json(dato);
-    } catch (error){
-        console.error("Error al obtener las entradas de insumos:", error);
-        res.status(500).json({ message: "Error al obtener las entradas de insumos", error });
-    }
-});
-
-router.get("/:id", async (req, res) => {
-    try {
-        const dato = await crud.obtenerUno(tabla, {id_entrada: req.params.id});
-        res.json(dato);
-    } catch (error){
-        res.status(500).json({ error: error.message || "Error al obtener la entrada de insumo" });
-    }
-});
-
-router.post("/", async (req, res) => {
-    try {
-        const nuevoDato = await crud.crear(tabla, {id_entrada: req.params.id}, req.body);
-        res.status(201).json(nuevoDato);
-    } catch (error) {
-        console.error("Error al crear la entrada de insumo:", error);
-        res.status(500).json({ error: error.message || "Error al crear la entrada de insumo" });
-    }
-});
-
-router.put("/:id", async (req, res) => {
-    try {
-        const datoActualizado = await crud.actualizar(tabla, {id_entrada: req.params.id}, req.body);
-        res.json(datoActualizado);
-    } catch (error) {
-        res.status(500).json({ error: error.message || "Error al actualizar la entrada de insumo" });
-    }
-});
-
-router.delete("/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-        const resultado = await crud.eliminar(tabla, {id_entrada: req.params.id});
-        res.json(resultado);
-    } catch (error) {
-        if (error.message.includes('Registro no encontrado')) {
-            res.status(404).json({ error: 'Entrada de insumo no encontrada' });
-        } else {
-            res.status(500).json({ error:  "Error al eliminar la entrada de insumo" + error.message });
-        }
-    }
-});
+router.get("/", (req, res) => insumoController.obtenerInsumo(req, res));
+router.get("/:id", (req, res) => insumoController.obtenerInsumoporId(req, res));
+router.post("/", (req, res) => insumoController.agregarInsumo(req, res));
+router.put("/:id", (req, res) => insumoController.actualizarInsumo(req, res));
+router.delete("/:id", (req, res) => insumoController.eliminarInsumo(req, res));
 
 export default router;

@@ -1,62 +1,67 @@
 import express from "express";
-import { CrudController } from "../controllers/crud.controller.js";
+import { UsuariosController } from "../controllers/usuarios.controller.js";
+import { verificarToken } from "../middlewares/auth.middleware.js";
+import { verificarEstadoUsuario } from "../middlewares/estado.middleware.js";
+import { permitirRoles, puedeActualizarUsuario } from "../middlewares/roles.middleware.js";
 
 const router = express.Router();
-const crud = new CrudController();
+const usuariosController = new UsuariosController();
 
-const tabla = 'usuario';
+//Rutas publicas
+router.post("/", (req, res) => usuariosController.agregarUsuario(req, res));
 
-//Rutas para operaciones CRUD
-router.get("/", async (req, res) => {
-    try {
-        const dato = await crud.obtenerTodos(tabla);
-        res.json(dato);
-    } catch (error){
-        console.error("Error al obtener los usuarios:", error);
-        res.status(500).json({ message: "Error al obtener los usuarios", error });
-    }
-});
+//Rutas protegidas
+// SOLO administrador puede ver la lista completa
+router.get("/", 
+    verificarToken,
+    verificarEstadoUsuario, 
+    permitirRoles("Administrador", "Operario"),
+    (req, res) => usuariosController.obtenerUsuario(req, res)
+);
+    
+// Administrador y operario pueden ver cualquier ID
+// Cliente solo puede ver su propio ID
+//router.get("/:id", verificarToken, permitirRoles("Administrador", "Operario"),(req, res) => usuariosController.obtenerUsuarioPorId(req, res));
+router.get("/:id",
+    verificarToken,
+    verificarEstadoUsuario,
+    (req, res, next) => {
 
-router.get("/:id", async (req, res) => {
-    try {
-        const dato = await crud.obtenerUno(tabla, {id_usuario: req.params.id});
-        res.json(dato);
-    } catch (error){
-        res.status(500).json({ error: error.message || "Error al obtener el usuario" });
-    }
-});
-
-router.post("/", async (req, res) => {
-    try {
-        const nuevoDato = await crud.crear(tabla, {id_usuario: req.params.id}, req.body);
-        res.status(201).json(nuevoDato);
-    } catch (error) {
-        console.error("Error al crear el usuario:", error);
-        res.status(500).json({ error: error.message || "Error al crear el usuario" });
-    }
-});
-
-router.put("/:id", async (req, res) => {
-    try {
-        const datoActualizado = await crud.actualizar(tabla, {id_usuario: req.params.id}, req.body);
-        res.json(datoActualizado);
-    } catch (error) {
-        res.status(500).json({ error: error.message || "Error al actualizar el usuario" });
-    }
-});
-
-router.delete("/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-        const resultado = await crud.eliminar(tabla, {id_usuario: req.params.id});
-        res.json(resultado);
-    } catch (error) {
-        if (error.message.includes('Registro no encontrado')) {
-            res.status(404).json({ error: 'usuario no encontrado' });
-        } else {
-            res.status(500).json({ error:  "Error al eliminar el usuario" + error.message });
+        // Si es admin u operario → dejar pasar
+        if (["Administrador", "Operario"].includes(req.usuario.rol)) {
+            return next();
         }
-    }
-});
+
+        // Si es cliente → solo puede ver su propio registro
+        if (req.usuario.rol === "Cliente") {
+            if (req.usuario.id == req.params.id) {
+                return next();
+            }
+            return res.status(403).json({ error: "No puedes ver datos de otros usuarios" });
+        }
+    },
+    (req, res) => usuariosController.obtenerUsuarioPorId(req, res)
+);
+
+router.put("/:id",
+    verificarToken,
+    verificarEstadoUsuario,
+    puedeActualizarUsuario,
+    (req, res) => usuariosController.actualizarUsuario(req, res)
+);
+
+router.delete("/:id", 
+    verificarToken,
+    verificarEstadoUsuario,
+    permitirRoles("Administrador"),
+    (req, res) => usuariosController.eliminarUsuario(req, res)
+);
+
+router.patch("/:id",
+    verificarToken,
+    verificarEstadoUsuario,
+    permitirRoles("Administrador"),
+    (req, res) => usuariosController.inhabilitarUsuario(req, res)
+);
 
 export default router;

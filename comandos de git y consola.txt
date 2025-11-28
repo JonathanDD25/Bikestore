@@ -1,4 +1,4 @@
-npm crate vite@latest
+git status -m "npm crate vite@latest
 
 REPOSITORIO GITHUB
 	git init
@@ -77,6 +77,11 @@ para inicializar el projecto, entras al visual, abres la terminal e instalas las
 para añadir colaboradores y crear ramas en git
 primero te vas a settings, le das a colaborators, y colocas el correo del mienbro que quieras añadir
 
+<<<<<<< HEAD
+=======
+git pull 	//Se debe usar para traer todos los cambios del main, antes de hacer cualcuerl push
+
+>>>>>>> main
 clonas el repositorio donde se va a trabajar
 debes entrar a la carpeta del proyecto 
 git switch -c feature/nombre-rama  //crea y entra en la rama
