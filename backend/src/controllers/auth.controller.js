@@ -25,6 +25,11 @@ export class AuthController {
             // Almacena la información del usuario que concidió con el correo.
             const usuario = rows[0];
 
+            // 1.5 Verificar si el usuario está inhabilitado
+            if (usuario.rol && usuario.rol.toLowerCase() === 'inhabilitado') {
+                return res.status(403).json({ mensaje: "Cuenta inhabilitada. Contacte al administrador." });
+            }
+
             // 2. Comparar contraseña
             const claveValida = await bcrypt.compare(clave, usuario.clave);
 

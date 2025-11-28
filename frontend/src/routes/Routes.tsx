@@ -10,6 +10,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 // Páginas
 import Catalogo from "../pages/Catalogo";
 
+import ProductosAdmin from "../components/AdminPanel/ProductosAdmin";
+import UsuariosAdmin from "../components/AdminPanel/UsuariosAdmin";
+import VentasAdmin from "../components/AdminPanel/VentasAdmin";
+
 // Tipado para los items que entran al carrito
 export interface CartItem {
   id: number;
@@ -51,6 +55,15 @@ const AppRutas: React.FC<RoutesProps> = ({ onAddToCart }) => {
           element={<Catalogo categoria={categoria} onAddToCart={onAddToCart} />}
         />
       ))}
+
+      {/* Rutas de Administración */}
+      <Route path="/admin/productos" element={<ProductosAdmin />} />
+      <Route path="/admin/usuarios" element={<UsuariosAdmin />} />
+      <Route path="/admin/ventas" element={<VentasAdmin />} />
+
+      {/* Rutas de Operario */}
+      <Route path="/operario/productos" element={<ProductosAdmin />} />
+      <Route path="/operario/ventas" element={<VentasAdmin />} />
 
       {/* Redirección si la ruta no existe */}
       <Route path="*" element={<Navigate to="/" replace />} />

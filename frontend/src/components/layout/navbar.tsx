@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext"; // <--- IMPORTANTE
@@ -12,6 +12,9 @@ export default function NavBar() {
 
   const isAdminOrOperario =
     rol?.toLowerCase() === "administrador" ||
+    rol?.toLowerCase() === "operario";
+
+  const isOperario =
     rol?.toLowerCase() === "operario";
 
   const toggleMenu = () => setIsOpen((prev) => !prev);
@@ -31,7 +34,7 @@ export default function NavBar() {
         
         {/* BOTÓN GENERAL */}
         <li>
-          <NavLink to="/inicio" onClick={closeMenu}>
+          <NavLink to="/" onClick={closeMenu}>
             Inicio
           </NavLink>
         </li>
@@ -45,11 +48,13 @@ export default function NavBar() {
               </NavLink>
             </li>
 
+            {!isOperario && (
             <li>
               <NavLink to="/admin/usuarios" onClick={closeMenu}>
                 Usuarios
               </NavLink>
             </li>
+            )}
 
             <li>
               <NavLink to="/admin/ventas" onClick={closeMenu}>

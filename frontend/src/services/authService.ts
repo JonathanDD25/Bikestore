@@ -26,9 +26,14 @@ export const loginRequest = async (credentials: LoginCredentials): Promise<Login
         body: JSON.stringify(credentials),
     });
     if (!res.ok) {
-        // Puedes ver detalles si el backend envía mensaje de error
-        const errorMessage = await res.text();
-        throw new Error(`Error en login: ${errorMessage}`);
+        try {
+            const errorData = await res.json();
+            throw new Error(errorData.mensaje || "Error al iniciar sesión");
+        } catch (e) {
+            // Si no es JSON, leer como texto
+            const errorText = await res.text();
+            throw new Error(errorText || "Error al iniciar sesión");
+        }
     }
 
     return res.json();

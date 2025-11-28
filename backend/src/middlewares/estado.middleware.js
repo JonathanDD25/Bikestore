@@ -29,6 +29,7 @@ export const verificarEstadoUsuario = async (req, res, next) => {
         // Si todo está ok → continuar
         next();
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ error: "Error validando estado del usuario" });
     }
 };

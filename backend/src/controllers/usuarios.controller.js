@@ -23,6 +23,7 @@ export class UsuariosController {
             const dato = await crud.obtenerUno(tabla, {id_usuario: req.params.id});
             res.json(dato);
         } catch (error){
+            console.error("Error al obtener el usuario:", error);
             res.status(500).json({ error: error.message || "Error al obtener el usuario" });
         }
     };

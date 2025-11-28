@@ -1,6 +1,17 @@
 // productService.ts
 const API_URL = "http://localhost:3000/api/productos";
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.warn("No auth token found in localStorage");
+    }
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    };
+};
+
 // --- Tipos ---
 export interface Producto {
     id_producto: number;
@@ -17,7 +28,9 @@ export interface Producto {
 
 // --- Obtener todos ---
 export const obtenerProductos = async (): Promise<Producto[]> => {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_URL, {
+        headers: getAuthHeaders()
+    });
     if (!res.ok) throw new Error("Error al obtener los productos");
 
     const data: Producto[] = await res.json();
@@ -28,7 +41,9 @@ export const obtenerProductos = async (): Promise<Producto[]> => {
 
 // --- Obtener por ID ---
 export const obtenerProductoPorId = async (id: number): Promise<Producto> => {
-    const res = await fetch(`${API_URL}/${id}`);
+    const res = await fetch(`${API_URL}/${id}`, {
+        headers: getAuthHeaders()
+    });
     if (!res.ok) throw new Error("Error al obtener el producto");
 
     const p: Producto = await res.json();
@@ -39,7 +54,7 @@ export const obtenerProductoPorId = async (id: number): Promise<Producto> => {
 export const agregarProducto = async (producto: Partial<Producto>): Promise<Producto> => {
     const res = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(producto),
     });
 
@@ -56,7 +71,7 @@ export const actualizarProducto = async (
 ): Promise<Producto> => {
     const res = await fetch(`${API_URL}/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
     });
 
@@ -70,6 +85,7 @@ export const actualizarProducto = async (
 export const eliminarProducto = async (id: number): Promise<{ message: string }> => {
     const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        headers: getAuthHeaders()
     });
 
     if (!res.ok) throw new Error("Error al eliminar producto");

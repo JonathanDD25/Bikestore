@@ -1,7 +1,7 @@
 // src/services/usuarioServices.ts
 
 export interface Usuario {
-    id?: number;
+    id_usuario?: number;
     name: string;
     lastName: string;
     phone: string;
@@ -20,11 +20,26 @@ export interface CrearUsuarioDTO {
 
 const API_URL = "http://localhost:3000/api/usuarios";
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.warn("No auth token found in localStorage");
+    }
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    };
+};
+
 // --------------------------------------------------
 // Obtener todos los usuarios
 // --------------------------------------------------
 export const obtenerUsuario = async (): Promise<Usuario[]> => {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_URL, {
+        method: "GET",
+        headers: getAuthHeaders()
+    });
+
     if (!res.ok) throw new Error("Error al obtener los usuarios");
     return res.json();
 };
@@ -33,7 +48,10 @@ export const obtenerUsuario = async (): Promise<Usuario[]> => {
 // Obtener usuario por ID
 // --------------------------------------------------
 export const obtenerUsuarioPorId = async (id: number): Promise<Usuario> => {
-    const res = await fetch(`${API_URL}/${id}`);
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "GET",
+        headers: getAuthHeaders()
+    });
     if (!res.ok) throw new Error("Error al obtener el usuario");
     return res.json();
 };
@@ -44,7 +62,7 @@ export const obtenerUsuarioPorId = async (id: number): Promise<Usuario> => {
 export const crearUsuario = async (usuario: CrearUsuarioDTO): Promise<Usuario> => {
     const res = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(usuario),
     });
 
@@ -61,7 +79,7 @@ export const actualizarUsuario = async (
 ): Promise<Usuario> => {
     const res = await fetch(`${API_URL}/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
     });
 
@@ -75,6 +93,7 @@ export const actualizarUsuario = async (
 export const eliminarUsuario = async (id: number): Promise<any> => {
     const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        headers: getAuthHeaders()
     });
 
     if (!res.ok) throw new Error("Error al eliminar usuario");
@@ -85,7 +104,10 @@ export const eliminarUsuario = async (id: number): Promise<any> => {
 // Inhabilitar usuario (PATCH)
 // --------------------------------------------------
 export const inhabilitarUsuario = async (id: number): Promise<any> => {
-    const res = await fetch(`${API_URL}/${id}`, { method: "PATCH" });
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "PATCH",
+        headers: getAuthHeaders()
+    });
 
     if (!res.ok) throw new Error("Error al inhabilitar usuario");
     return res.json();

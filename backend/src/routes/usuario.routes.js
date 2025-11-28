@@ -15,7 +15,7 @@ router.post("/", (req, res) => usuariosController.agregarUsuario(req, res));
 router.get("/", 
     verificarToken,
     verificarEstadoUsuario, 
-    permitirRoles("Administrador", "Operario"),
+    permitirRoles("Administrador"),
     (req, res) => usuariosController.obtenerUsuario(req, res)
 );
     

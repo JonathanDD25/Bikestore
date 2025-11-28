@@ -5,6 +5,7 @@ import { loginRequest } from "../services/authService";
 interface AuthContextProps {
     user: any;
     token: string | null;
+    loading: boolean;
     login: (credenciales: any) => Promise<void>;
     logout: () => void;
 }
@@ -12,6 +13,7 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps>({
     user: null,
     token: null,
+    loading: true,
     login: async () => { },
     logout: () => { },
 });
@@ -23,6 +25,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<any>(null);
     const [token, setToken] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
     // --- Mantener sesión iniciada ---
     useEffect(() => {
@@ -33,6 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setToken(savedToken);
             setUser(JSON.parse(savedUser));
         }
+        setLoading(false);
     }, []);
 
     const login = async (credentials: any) => {
@@ -61,7 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

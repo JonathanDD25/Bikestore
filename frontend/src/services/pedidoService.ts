@@ -5,6 +5,22 @@ export interface Pedido {
     fecha_pedido?: string;
     precio_total: number;
     id_usuario: number;
+    nombres?: string;
+    apellidos?: string;
+    correo_cliente?: string;
+}
+
+export interface DetallePedido {
+    id_pedido: number;
+    id_producto: number;
+    cantidad: number;
+    precio_unitario: number;
+    nombre_producto: string;
+    descripcion: string;
+}
+
+export interface PedidoConDetalles extends Pedido {
+    detalles: DetallePedido[];
 }
 
 export const obtenerPedido = async (): Promise<Pedido[]> => {
@@ -42,5 +58,11 @@ export const actualizarPedido = async (id: number, data: Partial<Pedido>): Promi
 export const eliminarPedido = async (id: number): Promise<{ message: string }> => {
     const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Error al eliminar pedido");
+    return res.json();
+};
+
+export const obtenerDetallesDePedido = async (id: number): Promise<PedidoConDetalles> => {
+    const res = await fetch(`${API_URL}/${id}/detalles`);
+    if (!res.ok) throw new Error("Error al obtener detalles del pedido");
     return res.json();
 };

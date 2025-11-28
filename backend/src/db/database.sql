@@ -9,7 +9,11 @@ CREATE TABLE usuario (
     apellidos VARCHAR(50),
     correo VARCHAR(100) UNIQUE,
     clave VARCHAR(255),
+<<<<<<< HEAD
+    rol ENUM('Administrador', 'Operario', 'Cliente'),
+=======
     rol ENUM('Administrador', 'Operario', 'Cliente', 'Inhabilitado') DEFAULT 'Cliente',
+>>>>>>> main
     direccion VARCHAR(150),
     telefono VARCHAR(20)
 );
@@ -25,7 +29,10 @@ CREATE TABLE productos (
     descripcion TEXT,
     marca VARCHAR(30),
     categoria VARCHAR(30),
+<<<<<<< HEAD
+=======
     estado ENUM('Disponible','No disponible','Inhabilitado'),
+>>>>>>> main
     stock INT DEFAULT 0,
     stock_minimo INT DEFAULT 0
 );
@@ -38,7 +45,11 @@ CREATE TABLE pedido (
     fecha_pedido DATE DEFAULT (CURRENT_DATE),
     precio_total DECIMAL(18),
     descripcion TEXT,
+<<<<<<< HEAD
+    metodo_pago ENUM('Efectivo', 'Tarjeta'),
+=======
     metodo_pago VARCHAR(50),
+>>>>>>> main
     id_usuario INT,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
