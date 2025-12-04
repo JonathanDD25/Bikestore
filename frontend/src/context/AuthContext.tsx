@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
 import { loginRequest } from "../services/authService";
+import { obtenerUsuarioPorId } from "../services/usuarioService"
 
 interface AuthContextProps {
     user: any;
