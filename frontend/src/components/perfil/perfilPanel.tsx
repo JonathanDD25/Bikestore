@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { obtenerUsuarioPorId, actualizarUsuario } from "../../services/usuarioService";
+import { useCart } from "../../context/CartContext"; // ← importar hook del carrito
 import "./perfilPanle.css";
 
 export default function ProfilePanel({ isOpen, onClose }: any) {
     const { user, logout, setUser } = useAuth();
+    const { clearCart } = useCart();
     const [fullUser, setFullUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -115,7 +117,7 @@ export default function ProfilePanel({ isOpen, onClose }: any) {
                             </div>
 
                             <button onClick={() => setEditMode(true)} className="auth-btn profile-logout-btn">Editar perfil</button>
-                            <button onClick={() => { logout(); onClose(); }} className="auth-btn profile-logout-btn">Cerrar sesión</button>
+                            <button onClick={() => { logout(); onClose(); clearCart();}} className="auth-btn profile-logout-btn">Cerrar sesión</button>
                         </>
                     )}
 
