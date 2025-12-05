@@ -9,6 +9,7 @@ interface AuthContextProps {
     loading: boolean;
     login: (credenciales: any) => Promise<void>;
     logout: () => void;
+    setUser: (user: any) => void;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextProps>({
     loading: true,
     login: async () => { },
     logout: () => { },
+    setUser: () => { }, // evitar errores
 });
 
 interface AuthProviderProps {
@@ -66,7 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout,  setUser }}>
             {children}
         </AuthContext.Provider>
     );

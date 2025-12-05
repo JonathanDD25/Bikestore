@@ -62,12 +62,25 @@ export class UsuariosController {
 
     async actualizarUsuario(req, res) {
         try {
-            const datoActualizado = await crud.actualizar(tabla, {id_usuario: req.params.id}, req.body);
+            const { clave, ...restoCampos } = req.body;
+            let dataFinal = { ...restoCampos };
+
+            // Si se envía clave, encriptarla
+            if (clave && clave.trim() !== "") {
+                const claveEncriptada = await bcrypt.hash(clave, 10);
+                dataFinal.clave = claveEncriptada;
+            }
+
+            // Actualizar usuario en la base de datos
+            const datoActualizado = await crud.actualizar(tabla, { id_usuario: req.params.id }, dataFinal);
+
             res.json(datoActualizado);
         } catch (error) {
+            console.error("Error al actualizar el usuario:", error);
             res.status(500).json({ error: error.message || "Error al actualizar el usuario" });
         }
     };
+
 
     async eliminarUsuario(req, res) {
         try {
